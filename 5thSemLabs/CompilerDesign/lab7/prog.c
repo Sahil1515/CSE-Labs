@@ -68,7 +68,6 @@ void declarations()
     {
         declarations();
     }
-    else printf("Error at ( %d %d )",t.row,t.col);
 }
 
 void data_type()
@@ -84,13 +83,14 @@ void identifier_list()
     t=getNextToken(fa);
      if(strcmp(t.token_name,"id")==0)
      {
+         printf("What are you doing\n");
         t=getNextToken(fa);
         if(strcmp(t.token_name,",")==0)
         {
             identifier_list();
         }
     }
-    else printf("Error at ( %d %d )",t.row,t.col);
+    else printf(" Are you mad Error at ( %d %d )",t.row,t.col);
 
 }
 
