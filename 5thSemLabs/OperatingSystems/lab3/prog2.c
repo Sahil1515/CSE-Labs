@@ -7,7 +7,7 @@
 void main()
 {
 	pid_t pid;
-	char * arr[]={"./prog1.out",NULL};
+	char * arr[]={"./prog1",NULL};
 	pid =fork();
 
 	if(pid==-1)
@@ -17,7 +17,7 @@ void main()
 	else if(pid==0)
 	{
 		printf("I am child going to run the exec\n");
-		execvp(arr[0],arr);
+		execv(arr[0],arr);
 		printf("This will not be executed\n");
 		exit(0);
 	}
