@@ -7,13 +7,19 @@
 #include <netinet/in.h>
 #include <unistd.h>
 
-#define PORT 5000
+#define PORT 5002
 #define MAXLINE 1000
 
 // Server code
 int main()
 {
-    char buffer[100];
+    int buffer[3];
+
+    printf("hi");
+
+    int send_back[3][3];
+    int k=0;
+
     int servsockfd, len, n;
     struct sockaddr_in servaddr, cliaddr;
     bzero(&servaddr, sizeof(servaddr));
@@ -33,11 +39,24 @@ int main()
         len = sizeof(cliaddr);
 
         n = recvfrom(servsockfd, buffer, sizeof(buffer), 0, (struct sockaddr *)&cliaddr, &len);
-        buffer[n] = '\0';
-        puts(buffer);
+        // buffer[n] = '\0';
+
+        if(n<=0)
+        break;
+
+        for (int i = 0; i < 3; i++)
+        {
+            /* code */
+            send_back[k][i]=buffer[i];
+        }
+        k++;
+
+        printf("server");
+        
+        // puts(buffer);
         //Echoing back to the client
-        sendto(servsockfd, buffer, n, 0, (struct sockaddr *)&cliaddr, sizeof(cliaddr));
     }
+     sendto(servsockfd, send_back, n, 0, (struct sockaddr *)&cliaddr, sizeof(cliaddr));
 
     getchar();
     // close the descriptor
