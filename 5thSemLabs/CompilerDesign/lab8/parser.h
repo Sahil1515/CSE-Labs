@@ -3,6 +3,7 @@
 #include <string.h>
 #include <ctype.h>
 
+
 FILE *fa, *fb;
 
 typedef struct ste
@@ -232,13 +233,12 @@ token getNextToken()
 
             int num = 1;
 
-            if (strcmp(buf, "main") == 0)
-            {
+             if(strcmp(buf, "main")==0)
+        {
 
-                t = newToken(buf, row, col - strlen(buf) + 1);
-            }
-            else
-                t = newToken("id", row, col - strlen(buf) + 1);
+             t = newToken(buf, row, col - strlen(buf) + 1);
+        }
+         else   t = newToken("id", row, col - strlen(buf) + 1);
 
             ca = getc(file);
 
@@ -452,101 +452,4 @@ token getNextToken()
     }
 
     return t;
-}
-
-void preprocessing()
-{
-    char ca, cb;
-    ca = getc(fa);
-
-    while (ca != EOF)
-
-    {
-        if (ca == ' ' || ca == '\t')
-        {
-            putc(' ', fb);
-            while (ca == ' ' || ca == '\t')
-                ca = getc(fa);
-            ungetc(ca, fa);
-        }
-        else if (ca == '/')
-        {
-            cb = getc(fa);
-            if (cb == '/')
-            {
-                while (ca != '\n')
-                    ca = getc(fa);
-            }
-            else if (cb == '*')
-            {
-                do
-                {
-                    while (ca != '*')
-                        ca = getc(fa);
-                    ca = getc(fa);
-                } while (ca != '/');
-                ca = getc(fa);
-            }
-            else
-            {
-                putc(ca, fb);
-                putc(cb, fb);
-            }
-        }
-        else if (ca == '#')
-        {
-            while (ca != '\n')
-            {
-                ca = getc(fa);
-            }
-        }
-        else
-            putc(ca, fb);
-
-        ca = getc(fa);
-    }
-}
-int main()
-
-{
-
-    int prev, ca, cb;
-
-    fa = fopen("input.c", "r");
-
-    if (fa == NULL)
-
-    {
-
-        printf("Cannot open file \n");
-
-        exit(0);
-    }
-
-    fb = fopen("output.c", "w+");
-
-    preprocessing();
-    fclose(fa);
-    fclose(fb);
-
-    file = fopen("output.c", "r");
-
-    printf("Tokens:\n\n");
-
-    while (1)
-    {
-
-        token t = getNextToken();
-
-        if (strcmp(t.token_name, "EOF") == 0)
-            break;
-
-        printf("<%s, %d, %d>\n", t.token_name, t.row, t.col);
-    };
-
-    fclose(file);
-
-    printSt();
-
-    return 0;
 }

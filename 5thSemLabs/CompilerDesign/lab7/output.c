@@ -1,5 +1,5 @@
 main(){
 int a;
-char c;
+char c
 a=23;
 }
