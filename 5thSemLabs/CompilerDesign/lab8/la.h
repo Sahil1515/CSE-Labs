@@ -3,58 +3,43 @@
 #include <string.h>
 #include <ctype.h>
 
-
 FILE *fa, *fb;
-
 typedef struct ste
 {
     char lexeme[30];
     int index;
     char type[15];
     int size;
-
 } ste;
-
 typedef struct token
 {
     char token_name[100];
     unsigned int row, col;
 } token;
-
 typedef struct localTableData
 {
     char fn_name[30];
     int size;
 } localTableData;
-
 FILE *file;
-
 int row = 1, col = 0;
-
 ste table[10][100];
-
 localTableData tableData[10];
-
 int st_index = 0;
-
 int st_num = -1;
-
 int scope = 0;
-
 char dbuf[15] = "";
-
 int isKeyword(char *word)
 
 {
 
-    char *keylist[30] = {"const", "int", "struct", "break", "else", "char",
+    char keylist[][30] = {"const", "int", "struct", "break", "else", "char",
 
-                         "float", "long", "switch", "case", "enum", "return", "continue",
+                          "float", "long", "switch", "case", "enum", "return", "continue",
 
-                         "for", "signed", "void", "do", "if", "static", "while", "double", "sizeof", "short",
+                          "for", "signed", "void", "do", "if", "static", "while", "double", "sizeof", "short",
 
-                         "unsigned", "typedef", "true", "false", "bool", "printf", "scanf"};
-
+                          "unsigned", "typedef", "true", "false", "bool", "printf", "scanf"};
     for (int i = 0; i < 30; ++i)
 
     {
@@ -73,7 +58,7 @@ int isSpecialSymbol(char ch)
 
 {
 
-    return (strchr("[]{}(),;:.#", ch) != NULL);
+    return (strchr("[]{}(),;.#", ch) != NULL);
 }
 
 int isOperator(char ch)
@@ -88,13 +73,9 @@ token newToken(char name[50], int r, int c)
 {
 
     token t;
-
     strcpy(t.token_name, name);
-
     t.row = r;
-
     t.col = c;
-
     return t;
 }
 
@@ -103,15 +84,10 @@ void insertSt(char lexeme[100], char type[15], int size)
 {
 
     ste t;
-
     strcpy(t.lexeme, lexeme);
-
     strcpy(t.type, type);
-
     t.size = size;
-
     t.index = st_index + 1;
-
     for (int i = 0; i < st_index; i++)
 
     {
@@ -125,7 +101,6 @@ void insertSt(char lexeme[100], char type[15], int size)
     }
 
     table[st_num][st_index++] = t;
-
     tableData[st_num].size += 1;
 }
 
@@ -138,11 +113,8 @@ void printSt()
     {
 
         printf("\n------------------------------------\n");
-
         printf("\nSymbol table for %s\n\n", tableData[j].fn_name);
-
         printf("Index\tLexeme\tType\tSize\n");
-
         for (int i = 0; i < tableData[j].size; i++)
 
         {
@@ -159,25 +131,17 @@ token getNextToken()
 {
 
     char buf[30];
-
     int idx = 0;
-
     int ca = getc(file);
-
     col++;
-
     token t;
-
     while (ca == '\n')
 
     {
 
         strcpy(dbuf, "");
-
         ca = getc(file);
-
         col = 1;
-
         row += 1;
     }
 
@@ -193,7 +157,6 @@ token getNextToken()
     {
 
         ca = getc(file);
-
         col += 1;
     }
 
@@ -206,24 +169,18 @@ token getNextToken()
         {
 
             buf[idx++] = ca;
-
             ca = getc(file);
-
             col++;
         }
 
         ungetc(ca, file);
-
         col--;
-
         buf[idx] = '\0';
-
         if (isKeyword(buf))
 
         {
 
             strcpy(dbuf, buf);
-
             t = newToken(buf, row, col - strlen(buf) + 1);
         }
 
@@ -232,16 +189,14 @@ token getNextToken()
         {
 
             int num = 1;
+            if (strcmp(buf, "main") == 0)
+            {
 
-             if(strcmp(buf, "main")==0)
-        {
-
-             t = newToken(buf, row, col - strlen(buf) + 1);
-        }
-         else   t = newToken("id", row, col - strlen(buf) + 1);
-
+                t = newToken(buf, row, col - strlen(buf) + 1);
+            }
+            else
+                t = newToken("id", row, col - strlen(buf) + 1);
             ca = getc(file);
-
             if (ca == '(')
 
             {
@@ -258,16 +213,12 @@ token getNextToken()
                 {
 
                     //printf("New function %s\n\n", buf);
-
                     st_num++;
-
                     strcpy(tableData[st_num].fn_name, buf);
-
                     st_index = 0;
                 }
 
                 ungetc(ca, file);
-
                 return t;
             }
 
@@ -276,11 +227,8 @@ token getNextToken()
             {
 
                 int pos = ftell(file);
-
                 int cb;
-
                 num = 0;
-
                 while ((cb = getc(file)) != ']')
 
                 {
@@ -292,43 +240,32 @@ token getNextToken()
             }
 
             ungetc(ca, file);
-
             int sz = 0;
-
             if (strcmp(dbuf, "int") == 0 || strcmp(dbuf, "float") == 0)
                 sz = 4;
-
             else if (strcmp(dbuf, "char") == 0 || strcmp(dbuf, "bool") == 0)
                 sz = 1;
-
             else if (strcmp(dbuf, "double") == 0 || strcmp(dbuf, "long") == 0)
                 sz = 8;
-
             insertSt(buf, dbuf, sz * num);
         }
     }
 
     else if (isdigit(ca))
-
     {
 
         t = newToken("num", row, col);
-
         while (isdigit(ca) || ca == '.' || ca == 'e' || ca == 'E')
 
         {
 
             buf[idx++] = ca;
-
             ca = getc(file);
-
             col++;
         }
 
         ungetc(ca, file);
-
         col--;
-
         buf[idx] = '\0';
     }
 
@@ -337,15 +274,12 @@ token getNextToken()
     {
 
         t = newToken("string", row, col);
-
         do
 
         {
 
             ca = getc(file);
-
             col++;
-
         } while (ca != '"');
     }
 
@@ -355,14 +289,10 @@ token getNextToken()
 
         if (ca == '{')
             scope++;
-
         if (ca == '}')
             scope--;
-
         buf[idx++] = ca;
-
         buf[idx] = '\0';
-
         t = newToken(buf, row, col);
     }
 
@@ -371,10 +301,8 @@ token getNextToken()
     {
 
         buf[idx++] = ca;
-
         ca = getc(file);
         col++;
-
         if (ca == '=')
 
         {
@@ -387,12 +315,10 @@ token getNextToken()
         {
 
             ungetc(ca, file);
-
             col--;
         }
 
         buf[idx] = '\0';
-
         t = newToken(buf, row, col - strlen(buf) + 1);
     }
 
@@ -401,25 +327,20 @@ token getNextToken()
     {
 
         buf[idx++] = ca;
-
         ca = getc(file);
         col++;
-
         if (ca == '&')
 
             buf[idx++] = ca;
-
         else
 
         {
 
             ungetc(ca, file);
-
             col--;
         }
 
         buf[idx] = '\0';
-
         t = newToken(buf, row, col - strlen(buf) + 1);
     }
 
@@ -428,26 +349,20 @@ token getNextToken()
     {
 
         buf[idx++] = ca;
-
         ca = getc(file);
-
         col++;
-
         if (ca == '|')
 
             buf[idx++] = ca;
-
         else
 
         {
 
             ungetc(ca, file);
-
             col--;
         }
 
         buf[idx] = '\0';
-
         t = newToken(buf, row, col - strlen(buf) + 1);
     }
 
