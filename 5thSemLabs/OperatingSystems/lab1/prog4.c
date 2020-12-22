@@ -11,7 +11,7 @@ int main()
 	int out=open("myOutFile.txt",O_WRONLY);
 
 	char ch[10];
-	read(in,&ch,1);
+	// read(in,&ch,1);
 	while(read(in,&ch,1)==1)
 	{
 		write(out,&ch,1);
