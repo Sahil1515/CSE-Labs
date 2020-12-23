@@ -8,6 +8,7 @@ sem_t wrt;
 pthread_mutex_t mutex;
 int cnt = 1;
 int numreader = 0;
+
 void *reader(void *rno)
 {
     pthread_mutex_lock(&mutex);

@@ -24,7 +24,7 @@ void main()
 			printf("I AM CHILD\n");
 		}
 
-		exit(0);
+		// exit(0);
 	}
 	else
 	{
